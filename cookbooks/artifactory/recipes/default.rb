@@ -4,6 +4,10 @@
 #
 # Copyright (c) 2016 The Authors, All Rights Reserved.
 
+breakpoint "Trying breakpoint" do
+  action :break
+end
+
 execute "install_unzip" do
   command 'sudo apt-get install unzip'
   user "root"
@@ -16,7 +20,11 @@ remote_file '/root/jfrog-artifactory-oss-4.7.7.zip' do
   mode '0644'
 end
 
-include_recipe 'unzip::default'
+#include_recipe 'unzip::default'
+
+breakpoint "Trying breakpointi for second time" do
+  action :break
+end
 
 ruby_block "Copy artifact file" do
    block do

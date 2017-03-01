@@ -59,3 +59,4 @@ Policyfile.lock.json
 .vagrant.d/
 .kitchen/
 >>>>>>> 770115203dc49b268d4ffb91bb32e4e3c5a00230
+.chef

@@ -1,0 +1,157 @@
+knife azure server create (options)
+        --windows-auth-timeout MINUTES
+                                     The maximum time in minutes to wait to for authentication over the transport to the node to succeed. The default value is 25 minutes.
+        --azure-affinity-group GROUP Required if not using a Service Location. Specifies Affinity Group the VM should belong to.
+    -H HOSTNAME,                     Your Azure host name
+        --azure-api-host-name
+        --azure-availability-set NAME
+                                     Optional. Name of availability set to add virtual machine into.
+        --azure-connect-to-existing-dns
+                                     Set this flag to add the new VM to an existing deployment/service. Must give the name of the existing
+                                        DNS correctly in the --dns-name option
+        --azure-dns-name DNS_NAME    The DNS prefix name that can be used to access the cloud service which is unique within Windows Azure. Default is 'azure-dns-any_random_text'(e.g: azure-dns-be9b0f6f-7dda-456f-b2bf-4e28a3bc0add).
+                                      If you want to add new VM to an existing service/deployment, specify an exiting dns-name,
+                                      along with --azure-connect-to-existing-dns option.
+                                      Otherwise a new deployment is created. For example, if the DNS of cloud service is MyService you could access the cloud service
+                                      by calling: http://DNS_NAME.cloudapp.net
+        --azure-domain-name DOMAIN_NAME
+                                     Optional. Specifies the domain name to join. If the domains name is not specified, --azure-domain-user must specify the user principal name (UPN) format (user@fully-qualified-DNS-domain) or the fully-qualified-DNS-domain\username format
+        --azure-domain-ou-dn DOMAIN_OU_DN
+                                     Optional. Specifies the (LDAP) X 500-distinguished name of the organizational unit (OU) in which the computer account is created. This account is in Active Directory on a domain controller in the domain to which the computer is being joined. Example: OU=HR,dc=opscode,dc=com
+        --azure-domain-passwd DOMAIN_PASSWD
+                                     Optional. Specifies the password for domain user who has access to join the domain.
+        --azure-domain-user DOMAIN_USER_NAME
+                                     Optional. Specifies the username who has access to join the domain.
+          Supported format: username(if domain is already specified in --azure-domain-name option),
+          fully-qualified-DNS-domain\username, user@fully-qualified-DNS-domain
+        --azure-extension-client-config CLIENT_PATH
+                                     Optional. Path to a client.rb file for use by the bootstrapped node. Only honored when --bootstrap-protocol is set to `cloud-api`.
+        --azure-mgmt-cert FILENAME   Your Azure PEM file name
+        --azure-network-name NETWORK_NAME
+                                     Optional. Specifies the network of virtual machine
+    -o DISKNAME,                     Optional. Specifies the friendly name of the disk containing the guest OS image in the image repository.
+        --azure-os-disk-name
+        --azure-publish-settings-file FILENAME
+                                     Your Azure Publish Settings File
+    -m LOCATION,                     Required if not using an Affinity Group. Specifies the geographic location - the name of the data center location that is valid for your subscription.
+                                      Eg: West US, East US, East Asia, Southeast Asia, North Europe, West Europe
+        --azure-service-location
+    -I, --azure-source-image IMAGE   Required. Specifies the name of the disk image to use to create the virtual machine.
+                                      Do a "knife azure image list" to see a list of available images.
+    -a, --azure-storage-account NAME Required for advanced server-create option.
+                                      A name for the storage account that is unique within Windows Azure. Storage account names must be
+                                      between 3 and 24 characters in length and use numbers and lower-case letters only.
+                                      This name is the DNS prefix name and can be used to access blobs, queues, and tables in the storage account.
+                                      For example: http://ServiceName.blob.core.windows.net/mycontainer/
+        --azure-subnet-name SUBNET_NAME
+                                     Optional. Specifies the subnet of virtual machine
+        --azure-subscription-id ID   Your Azure subscription ID
+        --azure-vm-name NAME         Required for advanced server-create option.
+                                      Specifies the name for the virtual machine. The name must be unique within the deployment. The azure vm name cannot be more than 15 characters long
+        --azure-vm-ready-timeout TIMEOUT
+                                     The number of minutes that knife-azure will wait for the virtual machine state to transition from 'provisioning' to 'ready'. Default is 15.
+        --azure-vm-size SIZE         Optional. Size of virtual machine (ExtraSmall, Small, Medium, Large, ExtraLarge)
+        --azure-vm-startup-timeout TIMEOUT
+                                     The number of minutes that knife-azure will wait for the virtual machine to reach the 'provisioning' state. Default is 10.
+        --bootstrap-curl-options OPTIONS
+                                     Add options to curl when install chef-client
+        --bootstrap-install-command COMMANDS
+                                     Custom command to install chef-client
+        --bootstrap-no-proxy [NO_PROXY_URL|NO_PROXY_IP]
+                                     Do not proxy locations for the node being bootstrapped; this option is used internally by Opscode
+        --bootstrap-protocol protocol
+                                     Protocol to bootstrap windows servers. options: 'winrm' or 'ssh' or 'cloud-api'.
+        --bootstrap-proxy PROXY_URL  The proxy server for the node being bootstrapped
+        --bootstrap-template TEMPLATE
+                                     Bootstrap Chef using a built-in or custom template. Set to the full path of an erb template or use one of the built-in templates.
+        --bootstrap-url URL          URL to a custom installation script
+        --bootstrap-vault-file VAULT_FILE
+                                     A JSON file with a list of vault(s) and item(s) to be updated
+        --bootstrap-vault-item VAULT_ITEM
+                                     A single vault and item to update as "vault:item"
+        --bootstrap-vault-json VAULT_JSON
+                                     A JSON string with the vault(s) and item(s) to be updated
+        --bootstrap-version VERSION  The version of Chef to install
+        --bootstrap-wget-options OPTIONS
+                                     Add options to wget when installing chef-client
+    -f CA_TRUST_FILE,                The Certificate Authority (CA) trust file used for SSL transport
+        --ca-trust-file
+        --cert-passphrase PASSWORD   SSL Certificate Password
+        --cert-path PATH             SSL Certificate Path
+    -N, --node-name NAME             The Chef node name for your new node
+        --server-url URL             Chef Server URL
+        --chef-service-interval INTERVAL
+                                     Optional. Provide this option when --bootstrap-protocol is set to 'cloud-api'.
+                                  It specifies the frequency (in minutes) at which the chef-service runs.
+                                  Pass 0 if you don't want the chef-service to be installed on the target machine.
+        --chef-zero-host HOST        Host to start chef-zero on
+        --chef-zero-port PORT        Port (or port range) to start chef-zero on.  Port ranges like 1000,1010 or 8889-9999 will try all given ports until one works.
+    -k, --key KEY                    API Client Key
+        --[no-]color                 Use colored output, defaults to enabled
+    -c, --config CONFIG              The configuration file to use
+        --config-option OPTION=VALUE Override a single configuration option
+        --defaults                   Accept default values for all questions
+        --disable-editing            Do not open EDITOR, just accept the data as is
+    -d, --distro DISTRO              Bootstrap a distro using a template. [DEPRECATED] Use -t / --bootstrap-template option instead.
+    -e, --editor EDITOR              Set the editor to use for interactive commands
+    -s, --secret                     The secret key to use to decrypt data bag item values. Will be rendered on the node at c:/chef/encrypted_data_bag_secret and set in the rendered client config.
+        --secret-file SECRET_FILE    A file containing the secret key to use to encrypt data bag item values. Will be rendered on the node at c:/chef/encrypted_data_bag_secret and set in the rendered client config.
+    -E, --environment ENVIRONMENT    Set the Chef environment (except for in searches, where this will be flagrantly ignored)
+        --extended-logs              Optional. Provide this option when --bootstrap-protocol is set to 'cloud-api'. It shows chef converge logs in detail.
+        --[no-]fips                  Enable fips mode
+        --json-attribute-file FILE   A JSON file to be used to the first run of chef-client
+    -F, --format FORMAT              Which format to use for output
+    -A, --forward-agent              Enable SSH agent forwarding
+        --hint HINT_NAME[=HINT_FILE] Specify Ohai Hint to be set on the bootstrap target. Use multiple --hint options to specify multiple hints.
+        --[no-]host-key-verify       Verify host key, enabled by default.
+        --identity-file FILENAME     SSH identity file for authentication, optional. It is the RSA private key path. Specify either ssh-password or identity-file
+        --identity-file-passphrase PASSWORD
+                                     SSH key passphrase. Optional, specify if passphrase for identity-file exists
+        --install-as-service         Install chef-client as a Windows service
+    -j, --json-attributes JSON       A JSON string to be added to the first run of chef-client
+    -T, --keytab-file KEYTAB_FILE    The Kerberos keytab file used for authentication
+    -R KERBEROS_REALM,               The Kerberos realm used for authentication
+        --kerberos-realm
+    -S KERBEROS_SERVICE,             The Kerberos service used for authentication
+        --kerberos-service
+        --[no-]listen                Whether a local mode (-z) server binds to a port
+    -z, --local-mode                 Point knife commands at local repository instead of server
+        --msi-url URL                Location of the Chef Client MSI. The default templates will prefer to download from this location. The MSI will be downloaded from chef.io if not provided.
+        --user USER                  API Client Username
+        --node-ssl-verify-mode [peer|none]
+                                     Whether or not to verify the SSL cert for all HTTPS requests.
+        --[no-]node-verify-api-cert  Verify the SSL cert for HTTPS requests to the Chef server API.
+        --policy-group POLICY_GROUP  Policy group name to use (--policy-name must also be given)
+        --policy-name POLICY_NAME    Policyfile name to use (--policy-group must also be given)
+        --prerelease                 Install the pre-release chef gems
+        --print-after                Show the data after a destructive operation
+    -r, --run-list RUN_LIST          Comma separated list of roles/recipes to apply
+        --session-timeout Minutes    The timeout for the client for the maximum length of the WinRM session
+        --ssh-password PASSWORD      The ssh password
+        --ssh-port PORT              The ssh port. Default is 22. If --azure-connect-to-existing-dns set then default SSH port is random
+        --ssh-user USERNAME          The ssh username
+        --ssl-peer-fingerprint FINGERPRINT
+                                     ssl Cert Fingerprint to bypass normal cert chain checks
+        --tags TAGS                  Comma separated list of tags to apply to the node
+        --tcp-endpoints PORT_LIST    Comma-separated list of TCP local and public ports to open e.g. '80:80,433:5000'
+        --template-file TEMPLATE     Full path to location of template to use. [DEPRECATED] Use -t / --bootstrap-template option instead.
+        --thumbprint THUMBPRINT      The thumprint of the ssl certificate
+    -u, --udp-endpoints PORT_LIST    Comma-separated list of UDP local and public ports to open e.g. '80:80,433:5000'
+        --use-sudo-password          Execute the bootstrap via sudo with password
+    -V, --verbose                    More verbose output. Use twice for max verbosity
+        --verify-ssl-cert            Verify SSL Certificates for communication over HTTPS
+    -v, --version                    Show chef version
+        --winrm-authentication-protocol AUTHENTICATION_PROTOCOL
+                                     The authentication protocol used during WinRM communication. The supported protocols are basic,negotiate,kerberos. Default is 'negotiate'.
+        --winrm-codepage Codepage    The codepage to use for the winrm cmd shell
+        --winrm-max-memory-per-shell Set winrm max memory per shell in MB
+        --winrm-max-timeout MINUTES  Set winrm maximum command timeout in minutes, useful for long bootstraps
+    -P, --winrm-password PASSWORD    The WinRM password
+    -p, --winrm-port PORT            The WinRM port, by default this is '5985' for 'plaintext' and '5986' for 'ssl' winrm transport
+        --winrm-shell SHELL          The WinRM shell type. Valid choices are [cmd, powershell, elevated]. 'elevated' runs powershell in a scheduled task
+        --winrm-ssl-verify-mode SSL_VERIFY_MODE
+                                     The WinRM peer verification mode. Valid choices are [verify_peer, verify_none]
+    -t, --winrm-transport TRANSPORT  The WinRM transport type. Valid choices are [ssl, plaintext]
+    -x, --winrm-user USERNAME        The WinRM username
+    -y, --yes                        Say yes to all prompts for confirmation
+    -h, --help                       Show this message
