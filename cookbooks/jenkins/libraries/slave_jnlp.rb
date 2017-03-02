@@ -1,10 +1,10 @@
 #
-# Cookbook:: jenkins
+# Cookbook Name:: jenkins
 # HWRP:: jnlp_slave
 #
 # Author:: Seth Chisamore <schisamo@chef.io>
 #
-# Copyright:: 2013-2016, Chef Software, Inc.
+# Copyright 2013-2014, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,8 +22,12 @@
 require_relative 'slave'
 
 class Chef
-  class Resource::JenkinsJnlpSlave < Resource::JenkinsSlave
-    resource_name :jenkins_jnlp_slave
+  class Resource::JenkinsJNLPSlave < Resource::JenkinsSlave
+    # Chef attributes
+    provides :jenkins_jnlp_slave
+
+    # Set the resource name
+    self.resource_name = :jenkins_jnlp_slave
 
     # Actions
     actions :create, :delete, :connect, :disconnect, :online, :offline
@@ -41,17 +45,14 @@ class Chef
 end
 
 class Chef
-  class Provider::JenkinsJnlpSlave < Provider::JenkinsSlave
-    use_inline_resources
-    provides :jenkins_jnlp_slave
-
+  class Provider::JenkinsJNLPSlave < Provider::JenkinsSlave
     def load_current_resource
-      @current_resource ||= Resource::JenkinsJnlpSlave.new(new_resource.name)
+      @current_resource ||= Resource::JenkinsJNLPSlave.new(new_resource.name)
       super
     end
 
-    action :create do
-      do_create
+    def action_create
+      super
 
       parent_remote_fs_dir_resource.run_action(:create)
 
@@ -71,14 +72,14 @@ class Chef
       service_resource.run_action(:restart) if slave_jar_resource.updated?
     end
 
-    action :delete do
+    def action_delete
       # Stop and remove the service
       service_resource.run_action(:disable)
 
-      do_delete
+      super
     end
 
-    private
+    protected
 
     #
     # @see Chef::Resource::JenkinsSlave#launcher_groovy
@@ -145,9 +146,10 @@ class Chef
     # @return [Chef::Resource::Group]
     #
     def group_resource
-      @group_resource ||= build_resource(:group, new_resource.group) do
-        system(node['jenkins']['master']['use_system_accounts']) # ~FC048 this is a foodcritic bug
-      end
+      return @group_resource if @group_resource
+      @group_resource = Chef::Resource::Group.new(new_resource.group, run_context)
+      @group_resource.system(node['jenkins']['master']['use_system_accounts'])
+      @group_resource
     end
 
     #
@@ -158,12 +160,13 @@ class Chef
     # @return [Chef::Resource::User]
     #
     def user_resource
-      @user_resource ||= build_resource(:user, new_resource.user) do
-        gid(new_resource.group)
-        comment('Jenkins slave user - Created by Chef')
-        home(new_resource.remote_fs)
-        system(node['jenkins']['master']['use_system_accounts']) # ~FC048 this is a foodcritic bug
-      end
+      return @user_resource if @user_resource
+      @user_resource = Chef::Resource::User.new(new_resource.user, run_context)
+      @user_resource.gid(new_resource.group)
+      @user_resource.comment('Jenkins slave user - Created by Chef')
+      @user_resource.home(new_resource.remote_fs)
+      @user_resource.system(node['jenkins']['master']['use_system_accounts'])
+      @user_resource
     end
 
     #
@@ -174,13 +177,12 @@ class Chef
     # @return [Chef::Resource::Directory]
     #
     def parent_remote_fs_dir_resource
-      @parent_remote_fs_dir_resource ||=
-        begin
-          path = ::File.expand_path(new_resource.remote_fs, '..')
-          build_resource(:directory, path) do
-            recursive(true)
-          end
-        end
+      return @parent_remote_fs_dir_resource if @parent_remote_fs_dir_resource
+
+      path = ::File.expand_path(new_resource.remote_fs, '..')
+      @parent_remote_fs_dir_resource = Chef::Resource::Directory.new(path, run_context)
+      @parent_remote_fs_dir_resource.recursive(true)
+      @parent_remote_fs_dir_resource
     end
 
     #
@@ -191,11 +193,12 @@ class Chef
     # @return [Chef::Resource::Directory]
     #
     def remote_fs_dir_resource
-      @remote_fs_dir_resource ||= build_resource(:directory, new_resource.remote_fs) do
-        owner(new_resource.user)
-        group(new_resource.group)
-        recursive(true)
-      end
+      return @remote_fs_dir_resource if @remote_fs_dir_resource
+      @remote_fs_dir_resource = Chef::Resource::Directory.new(new_resource.remote_fs, run_context)
+      @remote_fs_dir_resource.owner(new_resource.user)
+      @remote_fs_dir_resource.group(new_resource.group)
+      @remote_fs_dir_resource.recursive(true)
+      @remote_fs_dir_resource
     end
 
     #
@@ -206,16 +209,13 @@ class Chef
     # @return [Chef::Resource::RemoteFile]
     #
     def slave_jar_resource
-      @slave_jar_resource ||=
-        begin
-          build_resource(:remote_file, slave_jar).tap do |r|
-            # We need to use .tap() to access methods in the provider's scope.
-            r.source slave_jar_url
-            r.backup(false)
-            r.mode('0755')
-            r.atomic_update(false)
-          end
-        end
+      return @slave_jar_resource if @slave_jar_resource
+      @slave_jar_resource = Chef::Resource::RemoteFile.new(slave_jar, run_context)
+      @slave_jar_resource.source(slave_jar_url)
+      @slave_jar_resource.backup(false)
+      @slave_jar_resource.mode('0755')
+      @slave_jar_resource.atomic_update(false)
+      @slave_jar_resource
     end
 
     #
@@ -226,25 +226,30 @@ class Chef
     # @return [Chef::Resource::RunitService]
     #
     def service_resource
-      @service_resource ||=
-        begin
-          # Ensure runit is installed on the slave.
-          include_recipe 'runit'
+      return @service_resource if @service_resource
 
-          build_resource(:runit_service, new_resource.service_name).tap do |r|
-            # We need to use .tap() to access methods in the provider's scope.
-            r.cookbook('jenkins')
-            r.run_template_name('jenkins-slave')
-            r.log_template_name('jenkins-slave')
-            r.options(
-              new_resource: new_resource,
-              java_bin:    java,
-              slave_jar:   slave_jar,
-              jnlp_url:    jnlp_url,
-              jnlp_secret: jnlp_secret
-            )
-          end
-        end
+      # Ensure runit is installed on the slave.
+      recipe_eval do
+        run_context.include_recipe 'runit'
+      end
+
+      @service_resource = Chef::Resource::RunitService.new(new_resource.service_name, run_context)
+      @service_resource.cookbook('jenkins')
+      @service_resource.run_template_name('jenkins-slave')
+      @service_resource.log_template_name('jenkins-slave')
+      @service_resource.options(
+        new_resource: new_resource,
+        java_bin:    java,
+        slave_jar:   slave_jar,
+        jnlp_url:    jnlp_url,
+        jnlp_secret: jnlp_secret,
+      )
+      @service_resource
     end
   end
 end
+
+Chef::Platform.set(
+  resource: :jenkins_jnlp_slave,
+  provider: Chef::Provider::JenkinsJNLPSlave,
+)

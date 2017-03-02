@@ -1,5 +1,5 @@
 #
-# Cookbook:: jenkins
+# Cookbook Name:: jenkins
 # Attributes:: master
 #
 # Author: Doug MacEachern <dougm@vmware.com>
@@ -7,8 +7,8 @@
 # Author: Seth Chisamore <schisamo@chef.io>
 # Author: Seth Vargo <sethvargo@gmail.com>
 #
-# Copyright:: 2010-2016, VMware, Inc.
-# Copyright:: 2012-2016, Chef Software, Inc.
+# Copyright 2010, VMware, Inc.
+# Copyright 2012-2014, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ default['jenkins']['master'].tap do |master|
   # Apt/Yum repos. On other platforms, the default method is using the war
   # file.
   #
-  #   node.normal['jenkins']['master']['install_method'] = 'war'
+  #   node.set['jenkins']['master']['install_method'] = 'war'
   #
   master['install_method'] = case node['platform_family']
                              when 'debian', 'rhel' then 'package'
@@ -48,7 +48,7 @@ default['jenkins']['master'].tap do |master|
   # The mirror to donload the Jenkins war file. This attribute is only used
   # in the "war" installation method.
   #
-  #   node.normal['jenkins']['master']['mirror'] = 'http://cache.example.com'
+  #   node.set['jenkins']['master']['mirror'] = 'http://cache.example.com'
   #
   # Note: this mirror is combined with some "smart" attributes to build the
   # Jenkins war. If you are not using an actual Jenkins mirror, you might be
@@ -65,7 +65,7 @@ default['jenkins']['master'].tap do |master|
   # war file. If you choose to override this file manually, it is highly
   # recommended that you also set the +checksum+ attribute.
   #
-  #   node.normal['jenkins']['master']['source'] = 'http://fs01.example.com/jenkins.war'
+  #   node.set['jenkins']['master']['source'] = 'http://fs01.example.com/jenkins.war'
   #
   # Warning: Setting this attribute will negate/ignore any values for +mirror+
   # and +version+.
@@ -76,9 +76,9 @@ default['jenkins']['master'].tap do |master|
   # The checksum of the war file. This is use to verify that the remote war file
   # has not been tampered with (such as a MITM attack). If you leave this #
   # attribute set to +nil+, no validation will be performed. If this attribute
-  # is set to the wrong SHA-256 checksum, the Chef Client run will fail.
+  # is set to the wrong MD5 checksum, the Chef Client run will fail.
   #
-  #   node.normal['jenkins']['master']['checksum'] = 'abcd1234...'
+  #   node.set['jenkins']['master']['checksum'] = 'abcd1234...'
   #
   master['checksum'] = nil
 
@@ -86,7 +86,7 @@ default['jenkins']['master'].tap do |master|
   # The list of options to pass to the Java JVM script when using the package
   # installer. For example:
   #
-  #   node.normal['jenkins']['master']['jvm_options'] = '-Xmx256m'
+  #   node.set['jenkins']['master']['jvm_options'] = '-Xmx256m'
   #
   master['jvm_options'] = nil
 
@@ -106,7 +106,7 @@ default['jenkins']['master'].tap do |master|
   # This attribute is _cumulative_, meaning it is appended to the end of the
   # existing environment variable.
   #
-  #   node.normal['jenkins']['master']['jenkins_args'] = '--argumentsRealm.roles.$ADMIN_USER=admin'
+  #   node.set['jenkins']['master']['jenkins_args'] = '--argumentsRealm.roles.$ADMIN_USER=admin'
   #
   master['jenkins_args'] = nil
 
@@ -115,7 +115,7 @@ default['jenkins']['master'].tap do |master|
   # change this to any user on the system. Chef will automatically create the
   # user if it does not exist.
   #
-  #   node.normal['jenkins']['master']['user'] = 'root'
+  #   node.set['jenkins']['master']['user'] = 'root'
   #
   master['user'] = 'jenkins'
 
@@ -130,7 +130,7 @@ default['jenkins']['master'].tap do |master|
   # The default of `true` will ensure that **new** jenkins user accounts are
   # created in the system ID range, exisitng users will not be modified.
   #
-  #   node.normal['jenkins']['master']['use_system_accounts'] = false
+  #   node.set['jenkins']['master']['use_system_accounts'] = false
   #
   master['use_system_accounts'] = true
 
@@ -162,7 +162,7 @@ default['jenkins']['master'].tap do |master|
   # Jenkins on port 80 on a custom domain with a proxy, you will need to set
   # that attribute here:
   #
-  #   node.normal['jenkins']['master']['endpoint'] = 'https://custom.domain.com/jenkins'
+  #   node.set['jenkins']['master']['endpoint'] = 'https://custom.domain.com/jenkins'
   #
   master['endpoint'] = "http://#{node['jenkins']['master']['host']}:#{node['jenkins']['master']['port']}"
 
@@ -180,45 +180,24 @@ default['jenkins']['master'].tap do |master|
   # by the same user and group as the home directory. If you need furthor
   # customization, you should override these values in your wrapper cookbook.
   #
-  #   node.normal['jenkins']['master']['log_directory'] = '/var/log/jenkins'
+  #   node.set['jenkins']['master']['log_directory'] = '/var/log/jenkins'
   #
   master['log_directory'] = '/var/log/jenkins'
-
-  #
-  # Set the max open files to a specific value.
-  # Due to http://github.com/jenkinsci/jenkins/commit/2fb288474e980d0e7ff9c4a3b768874835a3e92e
-  # reporting that Ubuntu's PAM configuration doesn't include pam_limits.so, and as a result the # of file
-  # descriptors are forced to 1024 regardless of /etc/security/limits.conf
-  #
-  master['maxopenfiles'] = 8192
-
-  #
-  # The groups of user under which Jenkins is running. Works for runit only.
-  #
-  master['runit']['groups'] = [node['jenkins']['master']['group']]
 
   #
   # The timeout passed to the runit cookbook's service resource. Override the
   # default timeout of 7 seconds. This option implies verbose.
   #
-  #   node.normal['jenkins']['master']['runit']['sv_timeout'] = 60
+  #   node.set['jenkins']['master']['runit']['sv_timeout'] = 60
   #
   master['runit']['sv_timeout'] = 7
-
-  #
-  # The limits for the Java process running the master server.
-  # Example to configure the maximum number of open file descriptors:
-  #
-  #   node.set['jenkins']['master']['ulimits'] = { 'n' => 8192 }
-  #
-  master['ulimits'] = nil
 
   #
   # Repository URL. Default is latest
   #
   master['repository'] = case node['platform_family']
                          when 'debian' then 'http://pkg.jenkins-ci.org/debian'
-                         when 'rhel' then 'https://pkg.jenkins.io/redhat'
+                         when 'rhel' then 'http://pkg.jenkins-ci.org/redhat'
                          end
 
   #
@@ -226,11 +205,6 @@ default['jenkins']['master'].tap do |master|
   #
   master['repository_key'] = case node['platform_family']
                              when 'debian' then 'http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key'
-                             when 'rhel' then 'https://pkg.jenkins.io/redhat/jenkins.io.key'
+                             when 'rhel' then 'http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key'
                              end
-
-  #
-  # Keyserver to use. Disabled by default
-  #
-  master['repository_keyserver'] = nil
 end

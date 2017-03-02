@@ -1,12 +1,12 @@
 #
-# Cookbook:: jenkins
+# Cookbook Name:: jenkins
 # Recipe:: _master_package
 #
 # Author: Guilhem Lettron <guilhem.lettron@youscribe.com>
 # Author: Seth Vargo <sethvargo@gmail.com>
 #
-# Copyright:: 2013-2016, Youscribe
-# Copyright:: 2014-2016, Chef Software, Inc.
+# Copyright 2013, Youscribe
+# Copyright 2014, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,13 +23,12 @@
 
 case node['platform_family']
 when 'debian'
+  include_recipe 'apt::default'
+
   apt_repository 'jenkins' do
     uri          node['jenkins']['master']['repository']
     distribution 'binary/'
     key          node['jenkins']['master']['repository_key']
-    unless node['jenkins']['master']['repository_keyserver'].nil?
-      keyserver    node['jenkins']['master']['repository_keyserver']
-    end
   end
 
   package 'jenkins' do
@@ -42,6 +41,8 @@ when 'debian'
     notifies :restart, 'service[jenkins]', :immediately
   end
 when 'rhel'
+  include_recipe 'yum::default'
+
   yum_repository 'jenkins-ci' do
     baseurl node['jenkins']['master']['repository']
     gpgkey  node['jenkins']['master']['repository_key']
@@ -49,15 +50,6 @@ when 'rhel'
 
   package 'jenkins' do
     version node['jenkins']['master']['version']
-  end
-
-  # The package install creates the Jenkins user so now is the time to set the home
-  # directory permissions.
-  directory node['jenkins']['master']['home'] do
-    owner     node['jenkins']['master']['user']
-    group     node['jenkins']['master']['group']
-    mode      '0755'
-    recursive true
   end
 
   template '/etc/sysconfig/jenkins' do
@@ -69,5 +61,5 @@ end
 
 service 'jenkins' do
   supports status: true, restart: true, reload: true
-  action [:enable, :start]
+  action  [:enable, :start]
 end

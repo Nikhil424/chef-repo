@@ -1,10 +1,10 @@
 #
-# Cookbook:: jenkins
+# Cookbook Name:: jenkins
 # HWRP:: credentials_password
 #
 # Author:: Seth Chisamore <schisamo@chef.io>
 #
-# Copyright:: 2013-2016, Chef Software, Inc.
+# Copyright 2013-2014, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,16 +20,20 @@
 #
 
 require_relative 'credentials'
-require_relative 'credentials_user'
 
 class Chef
-  class Resource::JenkinsPasswordCredentials < Resource::JenkinsUserCredentials
-    resource_name :jenkins_password_credentials
+  class Resource::JenkinsPasswordCredentials < Resource::JenkinsCredentials
+    # Chef attributes
+    provides :jenkins_password_credentials
+
+    # Set the resource name
+    self.resource_name = :jenkins_password_credentials
+
+    # Actions
+    actions :create, :delete
+    default_action :create
 
     # Attributes
-    attribute :username,
-              kind_of: String,
-              name_attribute: true
     attribute :password,
               kind_of: String,
               required: true
@@ -37,10 +41,7 @@ class Chef
 end
 
 class Chef
-  class Provider::JenkinsPasswordCredentials < Provider::JenkinsUserCredentials
-    use_inline_resources
-    provides :jenkins_password_credentials
-
+  class Provider::JenkinsPasswordCredentials < Provider::JenkinsCredentials
     def load_current_resource
       @current_resource ||= Resource::JenkinsPasswordCredentials.new(new_resource.name)
 
@@ -53,7 +54,7 @@ class Chef
       @current_credentials
     end
 
-    private
+    protected
 
     #
     # @see Chef::Resource::JenkinsCredentials#credentials_groovy
@@ -78,7 +79,14 @@ class Chef
     # @see Chef::Resource::JenkinsCredentials#attribute_to_property_map
     #
     def attribute_to_property_map
-      { password: 'credentials.password.plainText' }
+      {
+        password: 'credentials.password.plainText',
+      }
     end
   end
 end
+
+Chef::Platform.set(
+  resource: :jenkins_password_credentials,
+  provider: Chef::Provider::JenkinsPasswordCredentials,
+)

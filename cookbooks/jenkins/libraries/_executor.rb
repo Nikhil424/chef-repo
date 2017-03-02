@@ -1,10 +1,10 @@
 #
-# Cookbook:: jenkins
+# Cookbook Name:: jenkins
 # Library:: executor
 #
 # Author:: Seth Vargo <sethvargo@gmail.com>
 #
-# Copyright:: 2013-2016, Chef Software, Inc.
+# Copyright 2013-2014, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -70,7 +70,6 @@ module Jenkins
       command_options = pieces.last.is_a?(Hash) ? pieces.pop : {}
       command = []
       command << %("#{options[:java]}")
-      command << options[:jvm_options].to_s if options[:jvm_options]
       command << %(-jar "#{options[:cli]}")
       command << %(-s #{URI.escape(options[:endpoint])}) if options[:endpoint]
       command << %(-i "#{options[:key]}")                if options[:key]
