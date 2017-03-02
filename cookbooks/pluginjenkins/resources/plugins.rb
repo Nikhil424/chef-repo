@@ -1,15 +1,17 @@
+resource_name :pluginjenkins_plugins
+
 action :install do
 
   jenkins_plugin 'github' do
-    options '-deploy -cold'
+    notifies :restart, 'service[jenkins]', :immediately
   end
 
   jenkins_plugin 'buildresult-trigger' do
-    options '-deploy -cold'
+    notifies :restart, 'service[jenkins]', :immediately
   end
 
   jenkins_plugin 'artifactory' do
-    options '-deploy -cold'
+    notifies :restart, 'service[jenkins]', :immediately
   end
 
 end
