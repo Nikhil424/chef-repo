@@ -3,15 +3,24 @@ resource_name :pluginjenkins_plugins
 action :install do
 
   jenkins_plugin 'github' do
-    notifies :restart, 'service[jenkins]', :immediately
+    install_deps true
+    notifies :restart, 'runit_service[jenkins]', :immediately
   end
 
   jenkins_plugin 'buildresult-trigger' do
-    notifies :restart, 'service[jenkins]', :immediately
+    install_deps true
+    notifies :restart, 'runit_service[jenkins]', :immediately
+  end
+
+  jenkins_plugin 'workflow-step-api' do
+    version '2.9'
+    install_deps true
+    notifies :restart, 'runit_service[jenkins]', :immediately
   end
 
   jenkins_plugin 'artifactory' do
-    notifies :restart, 'service[jenkins]', :immediately
+    install_deps true
+    notifies :restart, 'runit_service[jenkins]', :immediately
   end
 
 end

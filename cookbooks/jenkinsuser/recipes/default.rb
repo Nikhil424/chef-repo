@@ -7,8 +7,7 @@
 # All rights reserved - Do Not Redistribute
 #
 
-jenkins_password_credentials 'user' do
-  id          'user-password'
-  description 'user of jenkins'
-  password    'jenkins'
+jenkinsuser_test 'This is to remove initial setup wizard in jenkins' do
+  action :remove
 end
+

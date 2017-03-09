@@ -1,0 +1,46 @@
+#require '/root/.chefdk/gem/ruby/2.3.0/gems/fog-aws-0.13.0/lib/fog/aws/parsers/compute/create_image.rb'
+require '/root/.chefdk/gem/ruby/2.3.0/gems/fog-aws-0.13.0/lib/fog/aws/parsers/ecs/base.rb'
+require '/root/.chefdk/gem/ruby/2.3.0/gems/fog-aws-0.13.0/lib/fog/aws/requests/compute/create_image.rb'
+require 'chef/knife/ec2_base'
+require 'chef/knife'
+#require '/opt/chefdk/embedded/lib/ruby/gems/2.3.0/gems/fog-aws-1.2.0/lib/fog/aws/'
+#require '/opt/chefdk/embedded/lib/ruby/gems/2.3.0/gems/fog-aws-1.2.0/lib/fog'
+#require 'fog/compute/aws/real'
+#require 'fog/aws/requests'
+require 'fog/parsers/base'
+class Chef
+  class Knife
+    class Ec2ImageCreate < Knife
+
+      require 'fog/aws/requests/compute/create_image'
+      include Knife::Ec2Base
+     # include Fog::Compute
+     # include Fog::Parsers::Base
+     # include Fog::Compute
+      banner 'knife ec2 image create INSTANCE-ID IMAGE-NAME (options)'
+
+      def run
+        unless name_args.size == 2
+          show_usage
+          Chef::Application.fatal! 'Wrong number of arguments'
+        end
+
+        instance_id = name_args[0]
+        image_name = name_args[1]
+
+        server = connection.servers.get(instance_id)
+        #compute = Fog::Compute.new
+        #create_image(instance_id, image_name, "imagetest")
+        #Fog::Parsers::Compute::AWS::CreateImage.new
+
+        Chef::Log.debug 'Found server object from the API, creating an image from it'
+        #Fog::Compute::AWS::Real.new(instance_id, image_name, "testing image")
+        #create_image(instance_id, image_name, "imagetest")
+        #AWS::Real.new(create_image)
+        puts 'Server image creation has been started'
+        puts Ec2ImageCreate.ancestors
+      end
+    end
+  end
+end
+

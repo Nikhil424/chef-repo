@@ -11,7 +11,9 @@
       "install_flavor": "openjdk"
     },
     "jenkins": {
-      "version": 1.652
+      "master": {
+        "install_method": "war"
+      } 
     }
   },
   "chef_type": "role",
